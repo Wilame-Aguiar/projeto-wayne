@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edição - Indústrias Wayne</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <style>
-      .hidden {
-          display: none;
-      }
-  </style>
+  <script src="{{ url_for('static', filename='js.js') }}" defer></script>
 </head>
 <body>
   <div class="container">
@@ -18,68 +14,56 @@
       <img src="{{ url_for('static', filename='wayne-logo.png') }}" alt="Wayne Industries" class="logo">
       <a href="/logout">Logout</a>
     </div>
+  </div>
     <h1>Edição e Exclusão</h1>
-    <h3 style="margin: 10px 10px;">Usuário: <b>{{session.user.upper()}}</b></h3>
-    
-    <!-- Seção de Edição -->
-    <div>
-        <p id="item-name">Nome do Item: <span id="item-value">Item 1</span></p>
-        <button id="edit-btn">Editar</button>
-    </div>
-    
-    <div id="edit-section" class="hidden">
-        <input type="text" id="edit-input" placeholder="Novo nome do item">
-        <button id="save-btn">Salvar</button>
-    </div>
-    <div id="edit-menu" class="hidden">
-      <h3>O que você deseja editar?</h3>
-      <button id="edit-room-btn">Editar Sala</button>
-      <button id="edit-item-btn">Editar Item</button>
-    </div>
-    
-    <table>
+    <h3>Usuário: <b>{{session.user.upper()}}</b></h3>
+
+    <!-- Tabela de Funcionários -->
+    <h2>Funcionários</h2>
+    <table id="funcionarios-table">
       <thead>
         <tr>
           <th>Nome</th>
-          <th>Número de Série</th>
-          <th>ID da Sala</th>
-          <th>Ação</th>
+          <th>CPF</th>
+          <th>Nível de Acesso</th>
+          <th>Ações</th>
         </tr>
       </thead>
-      <tbody id="data-table">
-        <!-- Os dados serão carregados via JavaScript -->
+      <tbody>
+        <!-- Os dados dos funcionários serão carregados aqui via JavaScript -->
+      </tbody>
+    </table>
+
+    <!-- Tabela de Itens -->
+    <h2>Itens</h2>
+    <table id="itens-table">
+      <thead>
+        <tr>
+          <th>Nome do Item</th>
+          <th>Número de Série</th>
+          <th>ID da Sala</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Os dados dos itens serão carregados aqui via JavaScript -->
+      </tbody>
+    </table>
+
+    <!-- Tabela de Salas -->
+    <h2>Salas</h2>
+    <table id="salas-table">
+      <thead>
+        <tr>
+          <th>Nome da Sala</th>
+          <th>Nível de Acesso</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Os dados das salas serão carregados aqui via JavaScript -->
       </tbody>
     </table>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Nome da Sala</th>
-        <th>Nível de Acesso</th>
-        <th>Ação</th>
-      </tr>
-    </thead>
-    <tbody id="sala-table">
-      <!-- Os dados serão carregados via JavaScript -->
-    </tbody>
-  </table>
-  <script src="{{ url_for('static', filename='js.js') }}"></script>
-  <script>
-      const editBtn = document.getElementById('edit-btn');
-      const editSection = document.getElementById('edit-section');
-      const editInput = document.getElementById('edit-input');
-      const itemValue = document.getElementById('item-value');
-
-      editBtn.addEventListener('click', () => {
-          editSection.classList.remove('hidden'); // Exibe a seção de edição
-          editInput.value = itemValue.textContent; // Preenche o campo de entrada com o valor atual
-      });
-
-      document.getElementById('save-btn').addEventListener('click', () => {
-          const newValue = editInput.value; // Obtém o novo valor do campo de entrada
-          itemValue.textContent = newValue; // Atualiza o valor exibido
-          editSection.classList.add('hidden'); // Esconde a seção de edição
-      });
-  </script>
 </body>
 </html>

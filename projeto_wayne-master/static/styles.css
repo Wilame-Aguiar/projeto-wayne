@@ -134,3 +134,60 @@ button {
 button:hover {
   background-color: #c20511;
 }
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #000000;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #e30613;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+th {
+  background-color: #e30613;
+  color: #fff;
+}
+
+.btn {
+  background-color: #e30613;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn:hover {
+  background-color: #c20511;
+}
+
+.hidden {
+  display: none;
+}

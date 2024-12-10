@@ -299,206 +299,378 @@ async function carregarGerenciamento() {
 document.addEventListener('DOMContentLoaded', carregarGerenciamento);
 
 //Editar itens de inventário
-// Função para carregar itens na tabela
+document.addEventListener('DOMContentLoaded', () => {
+  carregarFuncionarios();
+  carregarItens();
+  carregarSalas();
+});
+
+// Função para carregar funcionários
+async function carregarFuncionarios() {
+  try {
+      const response = await fetch('/usuarios');
+      const funcionarios = await response.json();
+      const tbody = document.querySelector('#funcionarios-table tbody');
+      tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
+
+      funcionarios.forEach(funcionario => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td><input type="text" value="${funcionario.NM_USUARIO}" data-id="${funcionario.ID_USUARIO}" /></td>
+              <td><input type="text" value="${funcionario.CPF}" /></td>
+              <td>
+                  <select>
+                      <option value="1" ${funcionario.NVL_ACESSO === 1 ? 'selected' : ''}>Funcionário</option>
+                      <option value="2" ${funcionario.NVL_ACESSO === 2 ? 'selected' : ''}>Gerente</option>
+                      <option value="3" ${funcionario.NVL_ACESSO === 3 ? 'selected' : ''}>Administrado</option>
+                  </select>
+              </td>
+              <td>
+                  <button class="btn" onclick="salvarFuncionario(${funcionario.ID_USUARIO})">Salvar</button>
+                  <button class="btn" onclick="deletarFuncionario(${funcionario.ID_USUARIO})">Deletar</button>
+              </td>
+          `;
+          tbody.appendChild(row);
+      });
+  } catch (error) {
+      console.error('Erro ao carregar funcionários:', error);
+  }
+}
+
+// Função para carregar itens
 async function carregarItens() {
-  try {
-    const response = await fetch('/inventario'); // Altere a URL conforme necessário
-    const itens = await response.json();
-    
-    const dataTable = document.getElementById('data-table');
-    dataTable.innerHTML = ''; // Limpa a tabela antes de adicionar novos itens
+try {
+      const response = await fetch('/itens');
+      const itens = await response.json();
+      const tbody = document.querySelector('#itens-table tbody');
+      tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
 
-    itens.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>
-          <span class="item-name" id="item-name-${item.ID_RECURSO}">${item.DE_RECURSO}</span>
-          <input type="text" id="edit-input-${item.ID_RECURSO}" style="display:none;" placeholder="Novo nome" />
-        </td>
-        <td>
-          <input type="text" id="nr-serie-input-${item.ID_RECURSO}" value="${item.NR_SERIE}" placeholder="Número de Série" />
-        </td>
-        <td>
-          <input type="text" id="id-sala-input-${item.ID_RECURSO}" value="${item.ID_SALA}" placeholder="ID da Sala" />
-        </td>
-        <td>
-          <button onclick="toggleEdit(${item.ID_RECURSO})">Editar</button>
-          <button onclick="deletarItem(${item.ID_RECURSO})">Deletar</button>
-        </td>
-      `;
-      dataTable.appendChild(row);
-    });
+      itens.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td><input type="text" value="${item.NOME_ITEM}" data-id="${item.ID_ITEM}" /></td>
+              <td><input type="text" value="${item.NUMERO_SERIE}" /></td>
+              <td><input type="text" value="${item.ID_SALA}" /></td>
+              <td>
+                  <button class="btn" onclick="salvarItem(${item.ID_ITEM})">Salvar</button>
+                  <button class="btn" onclick="deletarItem(${item.ID_ITEM})">Deletar</button>
+              </td>
+          `;
+          tbody.appendChild(row);
+      });
   } catch (error) {
-    console.error('Erro ao carregar itens:', error);
+      console.error('Erro ao carregar itens:', error);
   }
 }
 
-// Função para alternar entre o modo de edição e o modo de visualização
-function toggleEdit(id) {
-  const itemName = document.getElementById(`item-name-${id}`);
-  const editInput = document.getElementById(`edit-input-${id}`);
+// Função para carregar salas
+async function carregarSalas() {
+  try {
+      const response = await fetch('/salas');
+      const salas = await response.json();
+      const tbody = document.querySelector('#salas-table tbody');
+      tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
 
-  if (editInput.style.display === "none") {
-    // Muda para o modo de edição
-    editInput.style.display = "block";
-    editInput.value = itemName.textContent; // Preenche o campo de entrada com o valor atual
-    itemName.style.display = "none"; // Esconde o nome do item
-  } else {
-    // Muda para o modo de visualização
-    const newValue = editInput.value;
-    itemName.textContent = newValue; // Atualiza o valor exibido
-    itemName.style.display = "block"; // Mostra o nome do item
-    editInput.style.display = "none"; // Esconde o campo de entrada
-
-    // Aqui você pode adicionar a lógica para salvar a alteração no banco de dados
-    salvarAlteracao(id, newValue);
+      salas.forEach(sala => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td><input type="text" value="${sala.NOME_SALA}" data-id="${sala.ID_SALA}" /></td>
+              <td>
+                  <select>
+                      <option value="1" ${sala.NVL_ACESSO === 1 ? 'selected' : ''}>Funcionário</option>
+                      <option value="2" ${sala.NVL_ACESSO === 2 ? 'selected' : ''}>Gerente</option>
+                      <option value="3" ${sala.NVL_ACESSO === 3 ? 'selected' : ''}>Administrado</option>
+                  </select>
+              </td>
+              <td>
+                  <button class="btn" onclick="salvarSala(${sala.ID_SALA})">Salvar</button>
+                  <button class="btn" onclick="deletarSala(${sala.ID_SALA})">Deletar</button>
+              </td>
+          `;
+          tbody.appendChild(row);
+      });
+  } catch (error) {
+      console.error('Erro ao carregar salas:', error);
   }
 }
 
-// Função para salvar a alteração no banco de dados
-async function salvarAlteracao(id, novoNome) {
-  // Aqui você deve coletar os outros campos necessários
-  const nrSerie = document.getElementById(`nr-serie-input-${id}`).value; // Supondo que você tenha um input para o número de série
-  const idSala = document.getElementById(`id-sala-input-${id}`).value; // Supondo que você tenha um input para o ID da sala
+// Função para salvar as alterações do funcionário
+async function salvarFuncionario(id) {
+  const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+  const nome = row.querySelector('input[type="text"]').value;
+  const cpf = row.querySelectorAll('input[type="text"]')[1].value;
+  const nivelAcesso = row.querySelector('select').value;
 
   try {
-    const response = await fetch(`/inventario/alter/${id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ DE_RECURSO: novoNome, NR_SERIE: nrSerie, ID_SALA: idSala })
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      alert(data.error);
-    }
+      const response = await fetch(`/usuarios/alter/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ NM_USUARIO: nome, CPF: cpf, NVL_ACESSO: nivelAcesso })
+      });
+
+      if (response.ok) {
+          alert('Funcionário salvo com sucesso!');
+          carregarFuncionarios(); // Recarrega a tabela após salvar
+      } else {
+          const errorData = await response.json();
+          alert('Erro ao salvar funcionário: ' + errorData.error);
+      }
   } catch (error) {
-    console.error('Erro ao salvar alteração:', error);
+      console.error('Erro ao salvar funcionário:', error);
+      alert('Erro ao salvar funcionário.');
   }
 }
-// Função para deletar um item
+
+// Função para deletar o funcionário
+async function deletarFuncionario(id) {
+  const confirmDelete = confirm("Tem certeza que deseja deletar este funcionário?");
+  if (confirmDelete) {
+      try {
+          const response = await fetch(`/usuarios/delete/${id}`, {
+              method: 'POST',
+          });
+
+          if (response.ok) {
+              alert('Funcionário deletado com sucesso!');
+              carregarFuncionarios(); // Recarrega a tabela após a exclusão
+          } else {
+              const errorData = await response.json();
+              alert('Erro ao deletar funcionário: ' + errorData.error);
+          }
+      } catch (error) {
+          console.error('Erro ao deletar funcionário:', error);
+          alert('Erro ao deletar funcionário.');
+      }
+  }
+}
+
+// Função para salvar as alterações do item
+async function salvarItem(id) {
+  const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+  const nomeItem = row.querySelector('input[type="text"]').value;
+  const numeroSerie = row.querySelectorAll('input[type="text"]')[1].value;
+  const idSala = row.querySelectorAll('input[type="text"]')[2].value;
+
+  try {
+      const response = await fetch(`/inventario/alter/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ NOME_ITEM: nomeItem, NUMERO_SERIE: numeroSerie, ID_SALA: idSala })
+      });
+
+      if (response.ok) {
+          alert('Item salvo com sucesso!');
+          carregarItens(); // Recarrega a tabela após salvar
+      } else {
+          const errorData = await response.json();
+          alert('Erro ao salvar item: ' + errorData.error);
+      }
+  } catch (error) {
+      console.error('Erro ao salvar item:', error);
+      alert('Erro ao salvar item.');
+  }
+}
+
+// Função para deletar o item
 async function deletarItem(id) {
   const confirmDelete = confirm("Tem certeza que deseja deletar este item?");
   if (confirmDelete) {
-    try {
-      const response = await fetch(`/inventario/delete/${id}`, {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (response.ok) {
-        alert(data.message);
-        carregarItens(); // Recarrega a tabela de itens após a deleção
-      } else {
-        alert(data.error);
+      try {
+          const response = await fetch(`/inventario/delete/${id}`, {
+              method: 'POST',
+          });
+
+          if (response.ok) {
+              alert('Item deletado com sucesso!');
+              carregarItens(); // Recarrega a tabela após a exclusão
+          } else {
+              const errorData = await response.json();
+              alert('Erro ao deletar item: ' + errorData.error);
+          }
+      } catch (error) {
+          console.error('Erro ao deletar item:', error);
+          alert('Erro ao deletar item.');
       }
-    } catch (error) {
-      console.error('Erro ao deletar item:', error);
-    }
   }
 }
-//editar salas
-// Função para carregar salas na tabela
-async function carregarSalas() {
-  try {
-    const response = await fetch('/salas'); // Altere a URL conforme necessário
-    const salas = await response.json();
-    
-    const salaTable = document.getElementById('sala-table');
-    salaTable.innerHTML = ''; // Limpa a tabela antes de adicionar novas salas
 
-    salas.forEach(sala => {
+// Função para salvar as alterações da sala
+async function salvarSala(id) {
+  const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+  const nomeSala = row.querySelector('input[type="text"]').value;
+  const nivelAcesso = row.querySelector('select').value;
+
+  try {
+      const response = await fetch(`/salas/alter/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ NOME_SALA: nomeSala, NVL_ACESSO: nivelAcesso })
+      });
+
+      if (response.ok) {
+          alert('Sala salva com sucesso!');
+          carregarSalas(); // Recarrega a tabela após salvar
+      } else {
+          const errorData = await response.json();
+          alert('Erro ao salvar sala: ' + errorData.error);
+      }
+  } catch (error) {
+      console.error('Erro ao salvar sala:', error);
+      alert('Erro ao salvar sala.');
+  }
+}
+
+// Função para deletar a sala
+async function deletarSala(id) {
+  const confirmDelete = confirm("Tem certeza que deseja deletar esta sala?");
+  if (confirmDelete) {
+      try {
+          const response = await fetch(`/salas/delete/${id}`, {
+              method: 'POST',
+          });
+
+          if (response.ok) {
+              alert('Sala deletada com sucesso!');
+              carregarSalas(); // Recarrega a tabela após a exclusão
+          } else {
+              const errorData = await response.json();
+              alert('Erro ao deletar sala: ' + errorData.error);
+          }
+      } catch (error) {
+          console.error('Erro ao deletar sala:', error);
+          alert('Erro ao deletar sala.');
+      }
+  }
+}
+
+
+
+
+
+
+
+// Função para carregar dados de funcionários
+async function carregarFuncionarios() {
+  const response = await fetch('/usuarios');
+  const funcionarios = await response.json();
+  const tbody = document.querySelector('#funcionarios-table tbody');
+  tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
+  funcionarios.forEach(funcionario => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>
-          <span class="sala-name" id="sala-name-${sala.ID_SALA}">${sala.DE_SALA}</span>
-          <input type="text" id="edit-sala-input-${sala.ID_SALA}" style="display:none;" placeholder="Novo nome" />
-        </td>
-        <td>
-          <input type="text" id="nvl-acesso-input-${sala.ID_SALA}" value="${sala.NVL_ACESSO}" placeholder="Nível de Acesso" />
-        </td>
-        <td>
-          <button onclick="toggleEditSala(${sala.ID_SALA})">Editar</button>
-          <button onclick="deletarSala(${sala.ID_SALA})">Deletar</button>
-        </td>
+          <td><input type="text" value="${funcionario.NM_USUARIO}" data-id="${funcionario.ID_USUARIO}" /></td>
+          <td><input type="text" value="${funcionario.CPF}" /></td>
+          <td><input type="text" value="${funcionario.NVL_ACESSO}" /></td>
+          <td>
+              <button class="btn" onclick="editarFuncionario(${funcionario.ID_USUARIO})">Editar</button>
+              <button class="btn" onclick="salvar Funcionario(${funcionario.ID_USUARIO})">Salvar</button>
+              <button class="btn" onclick="deletarFuncionario(${funcionario.ID_USUARIO})">Deletar</button>
+          </td>
       `;
-      salaTable.appendChild(row);
-    });
-  } catch (error) {
-    console.error('Erro ao carregar salas:', error);
-  }
-}
-// Função para alternar entre o modo de edição e o modo de visualização para salas
-function toggleEditSala(id) {
-  const salaName = document.getElementById(`sala-name-${id}`);
-  const editInput = document.getElementById(`edit-sala-input-${id}`);
-
-  if (editInput.style.display === "none") {
-    // Muda para o modo de edição
-    editInput.style.display = "block";
-    editInput.value = salaName.textContent; // Preenche o campo de entrada com o valor atual
-    salaName.style.display = "none"; // Esconde o nome da sala
-  } else {
-    // Muda para o modo de visualização
-    const newValue = editInput.value;
-    salaName.textContent = newValue; // Atualiza o valor exibido
-    salaName.style.display = "block"; // Mostra o nome da sala
-    editInput.style.display = "none"; // Esconde o campo de entrada
-
-    // Aqui você pode adicionar a lógica para salvar a alteração no banco de dados
-    salvarAlteracaoSala(id, newValue);
-  }
+      tbody.appendChild(row);
+  });
 }
 
-// Função para salvar a alteração da sala no banco de dados
-async function salvarAlteracaoSala(id, novoNome) {
-  const nvlAcesso = document.getElementById(`nvl-acesso-input-${id}`).value; // Coleta o nível de acesso
+// Função para editar funcionário
+function editarFuncionario(id) {
+  console.log(`Editando funcionário com ID: ${id}`);
+}
 
-  try {
-    const response = await fetch(`/salas/alter/${id}`, {
+// Função para salvar funcionário
+async function salvarFuncionario(id) {
+  const row = document.querySelector(`input[data-id="${id}"]`).closest('tr');
+  const nome = row.querySelector('input[type="text"]').value;
+  const cpf = row.querySelectorAll('input[type="text"]')[1].value;
+  const nivelAcesso = row.querySelectorAll('input[type="text"]')[2].value;
+
+  const response = await fetch(`/usuarios/alter/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ DE_SALA: novoNome, NVL_ACESSO: nvlAcesso })
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      alert(data.error);
-    }
-  } catch (error) {
-    console.error('Erro ao salvar alteração da sala:', error);
-  }
-}
-// Função para deletar uma sala
-async function deletarSala(id) {
-  const confirmDelete = confirm(" Você tem certeza de que deseja deletar esta sala?");
-  if (confirmDelete) {
-    try {
-      const response = await fetch(`/salas/deletar/${id}`, {
-        method: 'DELETE'
-      });
-      if (response.ok) {
-        carregarSalas(); // Recarrega a tabela após a exclusão
-      } else {
-        const data = await response.json();
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error('Erro ao deletar sala:', error);
-    }
-  }
-}
-document.getElementById('edit-btn').addEventListener('click', () => {
-  const editMenu = document.getElementById('edit-menu');
-  editMenu.classList.toggle('hidden'); // Alterna a visibilidade do menu de edição
-});
-document.getElementById('edit-room-btn').addEventListener('click', () => {
-  // Lógica para editar sala
-  // Por exemplo, redirecionar para a página de edição de salas
-  window.location.href = '/editar-sala'; // Altere para a URL correta
-});
+      body: JSON.stringify({ NM_USUARIO: nome, CPF: cpf, NIVEL_ACESSO: nivelAcesso })
+  });
 
-document.getElementById('edit-item-btn').addEventListener('click', () => {
-  // Lógica para editar item
-  // Por exemplo, redirecionar para a página de edição de itens
-  window.location.href = '/editar-item'; // Altere para a URL correta
-});
+  if (response.ok) {
+      alert('Funcionário salvo com sucesso!');
+      carregarFuncionarios(); // Recarrega a tabela após salvar
+  } else {
+      alert('Erro ao salvar funcionário.');
+  }
+}
+
+// Função para deletar funcionário
+async function deletarFuncionario(id) {
+  const confirmDelete = confirm("Tem certeza que deseja deletar este funcionário?");
+  if (confirmDelete) {
+      const response = await fetch(`/usuarios/delete/${id}`, {
+          method: 'POST',
+      });
+
+      if (response.ok) {
+          alert('Funcionário deletado com sucesso!');
+          carregarFuncionarios(); // Recarrega a tabela após a exclusão
+      } else {
+          alert('Erro ao deletar funcionário.');
+      }
+  }
+}
+// Função para carregar dados de itens
+async function carregarItens() {
+  try {
+      const response = await fetch('/inventario');
+      if (!response.ok) {
+          throw new Error('Erro ao carregar itens: ' + response.statusText);
+      }
+      const itens = await response.json();
+      const tbody = document.querySelector('#itens-table tbody');
+      tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
+
+      itens.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td>${item.DE_RECURSO}</td>
+              <td>${item.NR_SERIE}</td>
+              <td>${item.ID_SALA}</td>
+              <td>
+                  <button class="btn" onclick="editarItem(${item.ID_RECURSO})">Editar</button>
+                  <button class="btn" onclick="deletarItem(${item.ID_RECURSO})">Deletar</button>
+              </td>
+          `;
+          tbody.appendChild(row);
+      });
+  } catch (error) {
+      console.error('Erro ao carregar itens:', error);
+  }
+}
 // Chame a função ao carregar a página
-document.addEventListener('DOMContentLoaded', carregarItens);
+window.onload = function() {
+  carregarFuncionarios();
+  carregarItens(); // Certifique-se de que esta linha está presente
+};
+
+// Função para editar item
+function editarItem(id) {
+  console.log(`Editando item com ID: ${id}`);
+  // Implemente a lógica para editar o item
+}
+
+// Função para deletar item
+async function deletarItem(id) {
+  const confirmDelete = confirm("Tem certeza que deseja deletar este item?");
+  if (confirmDelete) {
+      const response = await fetch(`/inventario/delete/${id}`, {
+          method: 'POST',
+      });
+
+      if (response.ok) {
+          alert('Item deletado com sucesso!');
+          carregarItens(); // Recarrega a tabela após a exclusão
+      } else {
+          alert('Erro ao deletar item.');
+      }
+  }
+}
+
+// Chame a função ao carregar a página
+window.onload = function() {
+  carregarFuncionarios();
+};
